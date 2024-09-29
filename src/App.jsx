@@ -5,6 +5,7 @@ import { useState } from 'react';
 import {ChatRoom} from './components/ChatRoom.jsx'
 import { Auth } from './components/auth.jsx'
 import {GroupChatsSideBar} from './components/GroupChatsSideBar.jsx'
+import {NewGroupChatButton} from './components/NewGroupChatButton.jsx'
 
 // Firebase 
 import { signOut } from 'firebase/auth';
@@ -14,6 +15,7 @@ import Cookies from 'universal-cookie'
 const cookies = new Cookies()
 
 function App() {
+  // Hooks
   const [groupChatId, setGroupChatId] = useState("NONE")
   const [authenticated, setAuthenticated] = useState(cookies.get('auth-token'))
 
@@ -41,10 +43,13 @@ function App() {
   return(
     <div className="flex px-4 py-1 bg-slate-200 w-screen h-screen rounded-lg">
       <div className='w-1/4 m-2 bg-white rounded-lg'>
+        <header className='flex justify-end px-2 mt-2'>
+          <NewGroupChatButton/>
+        </header>
         <GroupChatsSideBar groupChatId={groupChatId} setGroupChatId={setGroupChatId}/>
       </div>
       <div className='flex flex-col w-3/4 px-2 py-1 m-2 bg-white rounded-lg'>
-        <button onClick={signOutUser} className='bg-slate-100 hover:bg-slate-300 p-2 justify-center'>Sign Out</button>
+        <button onClick={signOutUser} className='bg-slate-200 hover:bg-slate-300 p-2 justify-center'>Sign Out</button>
         <ChatRoom groupChatId={groupChatId} setGroupChatId={setGroupChatId}/>
       </div>
     </div>

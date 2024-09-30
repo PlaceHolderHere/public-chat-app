@@ -23,8 +23,6 @@ export const ChatRoom = (props) => {
     const [messagesRef, setMessagesRef] = useState(collection(database, 'group-chats', groupChatId, 'messages'))
 
     useEffect(() => {
-        // This code runs whenever myState changes
-        console.log(groupChatId)
         setMessagesRef(collection(database, 'group-chats', groupChatId, 'messages'))
       }, [groupChatId]);
 
@@ -45,14 +43,15 @@ export const ChatRoom = (props) => {
     const handleSubmit = async (event) => {
         setNewMessage("");
         event.preventDefault();
-        if (newMessage.replaceAll(" ", "") === "") return;
+        if (!newMessage) return;
         await addDoc(messagesRef, {
             text: newMessage,
             whenCreated: serverTimestamp(),
             user: auth.currentUser.displayName,
             userEmail: userEmail,
             userPhoto: userPhoto,
-        })    
+        })
+        
       };
 
     if (groupChatId !== "NONE"){

@@ -4,7 +4,11 @@ export const ChatMessage = (props) =>{
     const photo = props.photo
     const currentUser = props.currentUser
 
-    if (currentUser == user){
+    if (user == 'admin'){
+        return(<></>)
+    }
+    
+    else if (currentUser == user){
         return(
         <div className="flex justify-end ml-auto items-center m-4 max-w-lg">
             <p className="py-2 px-4 m-1 text-base bg-blue-100 rounded-lg whitespace-normal overflow-auto break-words">

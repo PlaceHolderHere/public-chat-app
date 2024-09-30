@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
-import {docRef} from 'firebase/firestore'
+import { database } from "../firebase-config";
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies()
@@ -30,24 +31,37 @@ export const NewGroupChatButton = () =>{
     }
 
     const createGroupChat = async () => {
-        setGroupChatName('')
-        setEmail('')
-        setMembers([userEmail])
-        if (!groupName || members.length === 0) {
+        if (!groupChatName || members.length === 0) {
             alert("Group name and at least one member are required!");
             return;
         }
-        if (groupName && members.length > 1){
+        if (groupChatName && members.length > 1){
             try {
-            const docRef = await addDoc(collection(db, "groupChats"), {
-                name: groupName,
-                members: members
-            });
-        
-            alert(`Group Chat "${groupName}" created!`);
-        
+                const groupChatsRef = collection(database, 'group-chats')
+
+                const newGroupChatDoc = await addDoc(groupChatsRef, {
+                    name: groupChatName,
+                    members: members
+                });
+                
+                const subCollectionRef = collection(newGroupChatDoc, "messages");
+
+                // Create a document inside the subcollection
+                await addDoc(subCollectionRef, {
+                    text: '',
+                    whenCreated: serverTimestamp(),
+                    user: 'admin',
+                    userEmail: '',
+                    userPhoto: '',
+                });
+                setScreenIsOpen(false)
+                setGroupChatName('')
+                setEmail('')
+                setMembers([userEmail])
+                alert(`Successfully created group chat "${groupChatName}"`)
+
             } catch (e) {
-            console.error("Error creating document: ", e);
+                alert(`Failed to create group chat "${groupChatName}"`);
             }
         }
     }
@@ -55,7 +69,7 @@ export const NewGroupChatButton = () =>{
     return(
         <>
             <div className='flex items-center justify-between w-full'>
-                <div class="flex-grow pl-1 md:pl-2">
+                <div className="flex-grow pl-1 md:pl-2">
                     <h1 className='invisible sm:visible sm:text-md md:text-xl font-bold'>Group Chats</h1>
                 </div>
                 <button onClick={toggleNewGCScreen} className="p-1 m-2 rounded-md flex justify-center items-center bg-slate-200 hover:bg-slate-300 aspect-square text-xl">
@@ -67,7 +81,7 @@ export const NewGroupChatButton = () =>{
             <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
                 <div className="bg-white p-6 rounded shadow-lg w-11/12 h-5/6">
                     <div className='flex items-center justify-between w-full'>
-                        <div class="flex-grow text-center">
+                        <div className="flex-grow text-center">
                             <h1 className='text-xl font-bold'>New Group Chat</h1>
                         </div>
                         <button
@@ -103,7 +117,7 @@ export const NewGroupChatButton = () =>{
                         </form>
                     </div>
                     <div className="flex justify-center mt-4">
-                        <button className='m-1 p-2 text-xl rounded-md bg-slate-200 hover:bg-slate-300'>
+                        <button onClick={createGroupChat} className='m-1 p-2 text-xl rounded-md bg-slate-200 hover:bg-slate-300'>
                             Create Group Chat
                         </button>
                     </div>
